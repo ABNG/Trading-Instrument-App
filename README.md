@@ -44,6 +44,15 @@ Designed with a minimalist UI to prioritize functionality and highlight price up
 
 ### Setup and Installation
 
+**Requirements**:
+```
+Flutter Version: 3.24.3
+Dart Version: 3.5.3
+Tested with Flutter 3.24.3 and Dart 3.5.3.
+```
+
+**Steps**:
+
 1. **Clone the Repository**:
 ```bash
    git clone https://github.com/ABNG/Trading-Instrument-App.git
