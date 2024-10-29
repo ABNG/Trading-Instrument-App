@@ -46,8 +46,8 @@ Designed with a minimalist UI to prioritize functionality and highlight price up
 
 1. **Clone the Repository**:
 ```bash
-   git clone https://github.com/your-repo/trading-instruments-ticker.git
-   cd trading-instruments-ticker
+   git clone https://github.com/ABNG/Trading-Instrument-App.git
+   cd Trading-Instrument-App
 ```
 
 2. **Install Dependencies**:
