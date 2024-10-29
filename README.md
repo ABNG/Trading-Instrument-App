@@ -1,6 +1,6 @@
 # Trading Instruments Real-Time Price Ticker Application
 
-> **Note:** Due to limitations of the free-tier Finnhub API, only one app can listen to the WebSocket data per account at a time. If multiple apps are running simultaneously, only one app will receive real-time data.
+> **Note:** Due to limitations of the free-tier Finnhub API, only one app can listen to the WebSocket data per account at a time. If multiple apps are running simultaneously, only one app will receive real-time data. i pushed my api key with the project because it is an assessment project. if you want to use your own api key, replace the key in .env file.
 
 ### Overview
 
