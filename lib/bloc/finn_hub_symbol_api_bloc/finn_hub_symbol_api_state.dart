@@ -25,3 +25,9 @@ final class FinnHubSymbolApiFailure extends FinnHubSymbolApiState {
   @override
   List<Object> get props => [message];
 }
+
+final class FinnHubSymbolApiClearData extends FinnHubSymbolApiState {
+  const FinnHubSymbolApiClearData();
+  @override
+  List<Object> get props => [];
+}

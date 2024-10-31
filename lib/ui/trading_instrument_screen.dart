@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trading_instruments/bloc/finn_hub_symbol_api_bloc/finn_hub_symbol_api_bloc.dart';
-import 'package:trading_instruments/data/model/symbol_model.dart';
 import 'package:trading_instruments/repository/finn_hub_repository.dart';
 import 'package:trading_instruments/ui/search_screen.dart';
 
@@ -59,7 +58,6 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
   final ScrollController _scrollController = ScrollController();
   Timer? _scrollStopTimer;
   bool isFirstTimeLoad = true;
-  List<SymbolModel> symbolModel = [];
   double _lastScrollPosition = 0.0;
 
   bool handleScrollNotification(ScrollNotification notification) {
@@ -91,7 +89,7 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
   }
 
   void _onScrollStopped() {
-    int itemCount = symbolModel.length;
+    int itemCount = context.read<FinnHubRepository>().inMemoryDB.length;
     double scrollOffset = _scrollController.position.pixels;
     double viewportHeight = _scrollController.position.viewportDimension;
     double scrollRange = _scrollController.position.maxScrollExtent -
@@ -109,7 +107,11 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
                 .floor() +
             15);
 
-    Set<String> subSetSymbols = symbolModel
+    Set<String> subSetSymbols = context
+        .read<FinnHubRepository>()
+        .inMemoryDB
+        .values
+        .toList()
         .sublist(firstVisibleItemIndex, lastVisibleItemIndex)
         .map((e) => e.symbol!)
         .toSet();
@@ -181,12 +183,16 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
             ///subscribe to the initially visible symbols
             if (state is FinnHubSymbolApiSuccess && isFirstTimeLoad) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                symbolModel = state.symbols;
+                context
+                    .read<FinnHubSymbolApiBloc>()
+                    .add(FinnHubSymbolClearDataEvent());
                 _onScroll();
                 isFirstTimeLoad = false;
               });
             }
           },
+          buildWhen: (previous, current) =>
+              current is! FinnHubSymbolApiClearData,
           builder: (context, state) {
             return switch (state) {
               FinnHubSymbolApiLoading() => Center(
@@ -196,9 +202,24 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
               FinnHubSymbolApiSuccess() =>
                 NotificationListener<ScrollNotification>(
                   onNotification: handleScrollNotification,
-                  child: ListView.separated(
+                  child: ListView.builder(
                     controller: _scrollController,
                     itemCount: state.symbols.length,
+                    prototypeItem: ListTile(
+                      title: Text(
+                        state.symbols.first.symbol ?? "",
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      trailing: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                              opacity: animation, child: child);
+                        },
+                        child: Text("Loading..."),
+                      ),
+                    ),
                     itemBuilder: (context, index) => BlocProvider(
                       key: ValueKey(state.symbols[index].symbol),
                       create: (context) => TradingInstrumentItemBloc(
@@ -211,7 +232,7 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
                         symbol: state.symbols[index].symbol ?? "",
                       ),
                     ),
-                    separatorBuilder: (context, index) => Divider(),
+                    // separatorBuilder: (context, index) => Divider(),
                   ),
                 ),
               FinnHubSymbolApiFailure() => Center(
@@ -230,6 +251,7 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
                     ],
                   ),
                 ),
+              FinnHubSymbolApiClearData() => throw UnimplementedError(),
             };
           },
         ),
