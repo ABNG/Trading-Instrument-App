@@ -183,16 +183,11 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
             ///subscribe to the initially visible symbols
             if (state is FinnHubSymbolApiSuccess && isFirstTimeLoad) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                context
-                    .read<FinnHubSymbolApiBloc>()
-                    .add(FinnHubSymbolClearDataEvent());
                 _onScroll();
                 isFirstTimeLoad = false;
               });
             }
           },
-          buildWhen: (previous, current) =>
-              current is! FinnHubSymbolApiClearData,
           builder: (context, state) {
             return switch (state) {
               FinnHubSymbolApiLoading() => Center(
@@ -251,7 +246,6 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
                     ],
                   ),
                 ),
-              FinnHubSymbolApiClearData() => throw UnimplementedError(),
             };
           },
         ),

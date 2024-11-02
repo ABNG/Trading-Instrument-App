@@ -45,9 +45,5 @@ class FinnHubSymbolApiBloc
         emit(FinnHubSymbolApiFailure(message: "something went wrong"));
       }
     });
-
-    on<FinnHubSymbolClearDataEvent>((event, emit) async {
-      emit(FinnHubSymbolApiClearData());
-    });
   }
 }
