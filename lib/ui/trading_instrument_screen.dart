@@ -205,15 +205,7 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
                         state.symbols.first.symbol ?? "",
                         style: TextStyle(fontSize: 12),
                       ),
-                      trailing: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                          return FadeTransition(
-                              opacity: animation, child: child);
-                        },
-                        child: Text("Loading..."),
-                      ),
+                      trailing: Text("Loading..."),
                     ),
                     itemBuilder: (context, index) => BlocProvider(
                       key: ValueKey(state.symbols[index].symbol),
