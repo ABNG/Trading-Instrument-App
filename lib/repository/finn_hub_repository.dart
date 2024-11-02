@@ -47,7 +47,7 @@ class FinnHubRepository {
     _finnHubSocketService.close();
   }
 
-  Stream<SymbolModel> listenToMessage() async* {
+  Stream<String> listenToMessage() async* {
     await for (final message in _finnHubSocketService.listenToMessage()) {
       for (var d in (message as List<dynamic>)) {
         ///for faster lookup used inMemoryDB and
@@ -58,7 +58,7 @@ class FinnHubRepository {
           final updatedSymbol =
               symbol.copyWith(price: formattedPrice, isPriceIncreasing: true);
           inMemoryDB[d["s"]] = updatedSymbol;
-          yield updatedSymbol;
+          yield updatedSymbol.symbol!;
         } else if (symbol.price != null && symbol.price != formattedPrice) {
           final newPrice = formattedPrice;
           final oldPrice = symbol.price ?? 0.0;
@@ -66,14 +66,14 @@ class FinnHubRepository {
               price: formattedPrice,
               isPriceIncreasing: newPrice > oldPrice ? true : false);
           inMemoryDB[d["s"]] = updatedSymbol;
-          yield updatedSymbol;
+          yield updatedSymbol.symbol!;
         } else {
           if (symbol.isPriceIncreasing != null) {
             final updatedSymbol = symbol.copyWith(
               isPriceIncreasing: null,
             );
             inMemoryDB[d["s"]] = updatedSymbol;
-            yield updatedSymbol;
+            yield updatedSymbol.symbol!;
           }
         }
       }

@@ -5,8 +5,7 @@ sealed class TradingInstrumentItemEvent extends Equatable {
 }
 
 class TradingInstrumentItemListenEvent extends TradingInstrumentItemEvent {
-  final String symbol;
-  const TradingInstrumentItemListenEvent(this.symbol);
+  const TradingInstrumentItemListenEvent();
   @override
-  List<Object> get props => [symbol];
+  List<Object> get props => [];
 }

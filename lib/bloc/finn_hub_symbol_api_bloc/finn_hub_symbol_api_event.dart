@@ -10,10 +10,3 @@ class FinnHubSymbolApiFetchEvent extends FinnHubSymbolApiEvent {
   @override
   List<Object?> get props => [];
 }
-
-class FinnHubSymbolClearDataEvent extends FinnHubSymbolApiEvent {
-  const FinnHubSymbolClearDataEvent();
-
-  @override
-  List<Object?> get props => [];
-}

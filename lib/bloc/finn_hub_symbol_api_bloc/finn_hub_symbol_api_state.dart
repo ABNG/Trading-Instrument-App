@@ -10,7 +10,7 @@ final class FinnHubSymbolApiLoading extends FinnHubSymbolApiState {
 }
 
 final class FinnHubSymbolApiSuccess extends FinnHubSymbolApiState {
-  final List<SymbolModel> symbols;
+  final List<String> symbols;
 
   const FinnHubSymbolApiSuccess({required this.symbols});
 
@@ -24,10 +24,4 @@ final class FinnHubSymbolApiFailure extends FinnHubSymbolApiState {
   const FinnHubSymbolApiFailure({required this.message});
   @override
   List<Object> get props => [message];
-}
-
-final class FinnHubSymbolApiClearData extends FinnHubSymbolApiState {
-  const FinnHubSymbolApiClearData();
-  @override
-  List<Object> get props => [];
 }

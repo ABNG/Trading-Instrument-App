@@ -35,8 +35,9 @@ class FinnHubSymbolApiBloc
           symbols.addAll(result);
         }
         await _finnHubRepository.saveSymbolToInMemoryDB(symbols);
-        emit(FinnHubSymbolApiSuccess(
-            symbols: _finnHubRepository.inMemoryDB.values.toList()));
+        final symbolsList = symbols.map((e) => e.symbol!).toList();
+        emit(FinnHubSymbolApiSuccess(symbols: symbolsList));
+        print(symbolsList.length);
       } on DioException catch (e) {
         emit(FinnHubSymbolApiFailure(message: e.message.toString()));
       } on FormatException catch (e) {
@@ -44,10 +45,6 @@ class FinnHubSymbolApiBloc
       } catch (e) {
         emit(FinnHubSymbolApiFailure(message: "something went wrong"));
       }
-    });
-
-    on<FinnHubSymbolClearDataEvent>((event, emit) async {
-      emit(FinnHubSymbolApiClearData());
     });
   }
 }

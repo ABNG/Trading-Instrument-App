@@ -36,6 +36,14 @@ class TradingInstrumentScreen extends StatelessWidget {
                 FinnHubSymbolApiFetchEvent(),
               ),
           ),
+          BlocProvider(
+            create: (context) => TradingInstrumentItemBloc(
+              finnHubRepository:
+                  RepositoryProvider.of<FinnHubRepository>(context),
+            )..add(
+                TradingInstrumentItemListenEvent(),
+              ),
+          ),
         ],
         child: TradingInstrumentView(),
       ),
@@ -183,16 +191,11 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
             ///subscribe to the initially visible symbols
             if (state is FinnHubSymbolApiSuccess && isFirstTimeLoad) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                context
-                    .read<FinnHubSymbolApiBloc>()
-                    .add(FinnHubSymbolClearDataEvent());
                 _onScroll();
                 isFirstTimeLoad = false;
               });
             }
           },
-          buildWhen: (previous, current) =>
-              current is! FinnHubSymbolApiClearData,
           builder: (context, state) {
             return switch (state) {
               FinnHubSymbolApiLoading() => Center(
@@ -207,7 +210,7 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
                     itemCount: state.symbols.length,
                     prototypeItem: ListTile(
                       title: Text(
-                        state.symbols.first.symbol ?? "",
+                        state.symbols.first,
                         style: TextStyle(fontSize: 12),
                       ),
                       trailing: AnimatedSwitcher(
@@ -220,17 +223,8 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
                         child: Text("Loading..."),
                       ),
                     ),
-                    itemBuilder: (context, index) => BlocProvider(
-                      key: ValueKey(state.symbols[index].symbol),
-                      create: (context) => TradingInstrumentItemBloc(
-                        finnHubRepository:
-                            RepositoryProvider.of<FinnHubRepository>(context),
-                      )..add(TradingInstrumentItemListenEvent(
-                          state.symbols[index].symbol ?? "",
-                        )),
-                      child: TradingInstrumentItem(
-                        symbol: state.symbols[index].symbol ?? "",
-                      ),
+                    itemBuilder: (context, index) => TradingInstrumentItem(
+                      symbol: state.symbols[index],
                     ),
                     // separatorBuilder: (context, index) => Divider(),
                   ),
@@ -251,7 +245,6 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
                     ],
                   ),
                 ),
-              FinnHubSymbolApiClearData() => throw UnimplementedError(),
             };
           },
         ),
@@ -270,15 +263,18 @@ class TradingInstrumentItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TradingInstrumentItemBloc, TradingInstrumentItemState>(
-      builder: (context, state) {
-        final symbolModel = (state as TradingInstrumentItemSuccess).symbolModel;
-        return ListTile(
-          title: Text(
-            symbol,
-            style: TextStyle(fontSize: 12),
-          ),
-          trailing: AnimatedSwitcher(
+    return ListTile(
+      title: Text(
+        symbol,
+        style: TextStyle(fontSize: 12),
+      ),
+      trailing:
+          BlocBuilder<TradingInstrumentItemBloc, TradingInstrumentItemState>(
+        buildWhen: (prev, current) => symbol == current.symbol,
+        builder: (context, state) {
+          final symbolModel =
+              context.read<FinnHubRepository>().inMemoryDB[symbol]!;
+          return AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
             transitionBuilder: (Widget child, Animation<double> animation) {
               return FadeTransition(opacity: animation, child: child);
@@ -296,9 +292,9 @@ class TradingInstrumentItem extends StatelessWidget {
                               : Colors.red,
                     ),
                   ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
