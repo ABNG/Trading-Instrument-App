@@ -70,16 +70,18 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
 
   bool handleScrollNotification(ScrollNotification notification) {
     if (notification is ScrollUpdateNotification) {
+      if (_scrollStopTimer != null) {
+        _scrollStopTimer!.cancel();
+      }
+    }
+    if (notification is ScrollEndNotification) {
       _onScroll(notification);
     }
     return true;
   }
 
-  void _onScroll([ScrollUpdateNotification? notification]) {
+  void _onScroll([ScrollEndNotification? notification]) {
     // Cancel any existing timer when the user is scrolling
-    if (_scrollStopTimer != null) {
-      _scrollStopTimer!.cancel();
-    }
 
     _scrollStopTimer = Timer(Duration(milliseconds: 200), () {
       if (notification == null) {
@@ -97,6 +99,7 @@ class _TradingInstrumentViewState extends State<TradingInstrumentView> {
   }
 
   void _onScrollStopped() {
+    print("Scroll End");
     int itemCount = context.read<FinnHubRepository>().inMemoryDB.length;
     double scrollOffset = _scrollController.position.pixels;
     double viewportHeight = _scrollController.position.viewportDimension;
